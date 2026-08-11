@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const mysql = require('mysql2');
 
@@ -16,6 +17,7 @@ db.connect(err => {
         console.log('Berhasil konek ke database Glowlist');
     }
 });
+app.use(cors());
 app.get('/produk', (req, res) => {
     const sql = 'SELECT * FROM produk';
     db.query(sql, (err, results) => {
