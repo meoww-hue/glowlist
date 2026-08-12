@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Produk() {
     const [produk, setProduk] = useState([]);
@@ -21,6 +21,9 @@ export default function Produk() {
     useEffect(() => {
         getProduk();
     }, []);
+
+    const navigate = useNavigate();
+
 
     const handleDelete = async (id) => {
         if (window.confirm("Yakkin ingin menghapus ini?")) {
@@ -76,7 +79,7 @@ export default function Produk() {
                                 <td>
                                     <button
                                         className="btn btn-warning btn-sm me-2"
-                                        onClick={() => handldeEdit(item.id_produk)}
+                                        onClick={() => handleEdit(item.id_produk)}
                                     >
                                         Edit
                                     </button>
