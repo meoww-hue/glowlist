@@ -19,9 +19,19 @@ db.connect(err => {
 });
 app.use(cors());
 app.use(express.json());
+
 app.get('/produk', (req, res) => {
     const sql = 'SELECT * FROM produk';
     db.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ error: err });
+        res.json(results);
+    });
+});
+
+app.get('/produk/:id_produk', (req, res) => {
+    const { id_produk } = req.params;
+    const sql = 'SELECT * FROM produk WHERE id_produk =?';
+    db.query(sql, [id_produk], (err, results) => {
         if (err) return res.status(500).json({ error: err });
         res.json(results);
     });
@@ -68,7 +78,7 @@ app.delete('/produk/:id_produk', (req, res) => {
     const sql = 'DELETE FROM produk WHERE id_produk = ?';
     db.query(sql, [id_produk], (err, result) => {
         if (err) return res.status(500).json({ error: err.sqlMessage });
-        
+
         if (result.affectedRows === 0) {
                 return res.status(404).json({message: "Produk tidak ditemukan"});
             }

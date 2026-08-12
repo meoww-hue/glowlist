@@ -15,58 +15,89 @@ export default function Produk() {
         } finally {
             setLoading(false);
         }
-    
-};
 
-useEffect(() => {
-    getProduk();
-}, []);
+    };
 
-if (loading) {
-    return <div className="container mt-4">Sedang memuat data...</div>;
-}
+    useEffect(() => {
+        getProduk();
+    }, []);
 
-return (
-    <div className="container mt-4">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-            <h2>Daftar Produk GlowList</h2>
-        </div>
+    const handleDelete = async (id) => {
+        if (window.confirm("Yakkin ingin menghapus ini?")) {
+            try {
+                const res = await fetch(`http://localhost:5000/produk/${id}`, {
+                    method: "DELETE",
+                });
+                if (res.ok) {
+                    alert("Produk berhasil dihapus");
+                }
+            } catch (err) {
+                console.error("Error saat delete:", err);
+                alert("Terjadi kesalahan saat menghapus data");
+            }
+        }
+    };
 
-        <div className="d-flex justify-content-between align-items-center mb-3">
-            <h2>Daftar Produk GlowList</h2>
-            <Link to="/produk/tambah" className="btn btn-primary">
-              + Tambah Produk
-            </Link>
-        </div>
+    const handleEdit = (id) => {
+        navigate(`/produk/edit/${id}`);
+    };
 
-        <table className="table table-bordered table-striped">
-            <thead className="table-primary">
-                <tr>
-                    <th>ID</th>
-                    <th>Judul</th>
-                    <th>Deskripsi</th>
-                    <th>Harga</th>
-                </tr>
-            </thead>
-            <tbody>
-                {produk.length > 0 ? (
-                    produk.map((item) => (
-                        <tr key={item.id_produk}>
-                            <td>{item.id_produk}</td>
-                            <td>{item.judul}</td>
-                            <td>{item.deskripsi}</td>
-                            <td>Rp {item.harga}</td>
-                        </tr>
-                    ))
-                ) : (
+    if (loading) {
+        return <div className="container mt-4">Sedang memuat data...</div>;
+    }
+
+    return (
+        <div className="container mt-4">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <h2>Daftar Produk GlowList</h2>
+                <Link to="/produk/tambah" className="btn btn-primary">
+                    + Tambah Produk
+                </Link>
+            </div>
+
+            <table className="table table-bordered table-striped">
+                <thead className="table-primary">
                     <tr>
-                        <td colSpan="4" className="text-center">
-                            Belum ada produk
-                        </td>
+                        <th>ID</th>
+                        <th>Judul</th>
+                        <th>Deskripsi</th>
+                        <th>Harga</th>
                     </tr>
-                )}
-            </tbody>
-        </table>
-    </div>
-);
+                </thead>
+                <tbody>
+                    {produk.length > 0 ? (
+                        produk.map((item) => (
+                            <tr key={item.id_produk}>
+                                <td>{item.id_produk}</td>
+                                <td>{item.judul}</td>
+                                <td>{item.deskripsi}</td>
+                                <td>Rp {item.harga}</td>
+
+                                <td>
+                                    <button
+                                        className="btn btn-warning btn-sm me-2"
+                                        onClick={() => handldeEdit(item.id_produk)}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        className="btn btn-danger btn-sm"
+                                        onClick={() => handleDelete(item.id_produk)}
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="4" className="text-center">
+                                Belum ada produk
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
+    );
 }
