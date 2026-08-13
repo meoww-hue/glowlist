@@ -3,6 +3,7 @@ const cors = require('cors');
 const app = express();
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
+const authJWT = require('./middleware');
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -38,7 +39,22 @@ app.get('/produk/:id_produk', (req, res) => {
     });
 });
 
-app.post('/produk', (req, res) => {
+app.get('/pengguna/me', authJWT, (req, res) => {
+    const id_pengguna = req.user.id;
+
+    const sql = 'SELECT id_pengguna, nama, email, no_hp FROM pengguna WHERE id_pengguna =?';
+    db.query(sql, [id_pengguna], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.sqlMessage});
+        }
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Pengguna tidak ditemukan'});
+        }
+        res.json(result);
+    });
+});
+
+app.post('/produk', authJWT, (req, res) => {
     const { judul, deskripsi, harga, id_kategori } = req.body;
 
     if (!judul || !harga || !deskripsi) {
@@ -55,7 +71,7 @@ app.post('/produk', (req, res) => {
     });
 });
 
-app.put('/produk/:id_produk', (req, res) => {
+app.put('/produk/:id_produk', authJWT, (req, res) => {
     const { id_produk } = req.params;
     const { judul, deskripsi, harga, id_kategori } = req.body;
 
@@ -74,7 +90,7 @@ app.put('/produk/:id_produk', (req, res) => {
     });
 });
 
-app.delete('/produk/:id_produk', (req, res) => {
+app.delete('/produk/:id_produk', authJWT, (req, res) => {
     const { id_produk } = req.params;
     const sql = 'DELETE FROM produk WHERE id_produk = ?';
     db.query(sql, [id_produk], (err, result) => {
