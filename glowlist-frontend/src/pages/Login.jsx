@@ -6,11 +6,11 @@ export default function Login() {
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.taget.value });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
-        e.prevenDefault();
+        e.preventDefault();
         try {
             const res = await fetch("http://localhost:5000/login", {
                 method: "POST",
@@ -59,7 +59,7 @@ export default function Login() {
                         placeholder="Password"
                         onChange={handleChange}
                         />
-                        <label htmlFor="floatingInput"> Email address </label>
+                        <label htmlFor="floatingPassword"> Password </label>
                     </div>
 
                     <button className="btn btn-primary w-100 py-2" type="submit">
