@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 
 export default function AddProduk() {
     const [formData, setFormData] = useState({
@@ -8,6 +8,7 @@ export default function AddProduk() {
         harga: "",
         id_kategori: "",
     });
+    const [file, setFile] = useState(null);
 
     const [kategori, setKategori] = useState([]);
 
@@ -33,18 +34,32 @@ export default function AddProduk() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const data = new FormData();
+        data.append("judul", formData.judul);
+        data.append("deskripsi", formData.deskripsi);
+        data.append("harga", formData.harga);
+        data.append("id_kategori", formData.id_kategori);
+        data.append("file", file);
+
+        if (file && file.size > 2 * 1024 * 1024) {
+            alert("Ukuran file terlalu besar maksimal 2MB");
+            return;
+        }
+
         try {
-            const res = await fetch("http://localhost:5000/produk/", {
+            const res = await fetch("http://localhost:5000/produk", {
                 method: "POST",
-                headers: { "Content-Type": "application/json"},
-                body: JSON.stringify(formData),
+                headers: { 
+                    Authorization: `Baerer ${localStorage.getItem("token")}`,
+                },
+                body: data,
             });
             if (res.ok) {
                 alert("Produk berhasil ditambahkan!");
                 navigate("/produk");
             } else {
-                const data = await res.json();
-                alert(data.message || "Gagal menambah produk");
+                alert("Gagal menambah produk");
             }
         } catch (err) {
             console.error("Error:", err);
@@ -109,6 +124,16 @@ export default function AddProduk() {
                             </option>
                         ))}
                     </select>
+                </div>
+
+                <div className="mb-3">
+                    <label className="form-label">Foto Produk</label>
+                    <input
+                    type="file"
+                    accept="image/*"
+                    className="form-control"
+                    onChange={(e) => setFile(e.target.files[0])}
+                    />
                 </div>
 
                 <button type="submit" className="btn btn-success">

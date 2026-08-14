@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Produk() {
     const [produk, setProduk] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const getProduk = async () => {
         try {
@@ -22,7 +23,7 @@ export default function Produk() {
         getProduk();
     }, []);
 
-    const navigate = useNavigate();
+    
 
 
     const handleDelete = async (id) => {
@@ -36,6 +37,7 @@ export default function Produk() {
                 });
                 if (res.ok) {
                     alert("Produk berhasil dihapus");
+                    getProduk();
                 }
             } catch (err) {
                 console.error("Error saat delete:", err);
@@ -65,9 +67,11 @@ export default function Produk() {
                 <thead className="table-primary">
                     <tr>
                         <th>ID</th>
+                        <th>Foto</th>
                         <th>Judul</th>
                         <th>Deskripsi</th>
                         <th>Harga</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -75,6 +79,18 @@ export default function Produk() {
                         produk.map((item) => (
                             <tr key={item.id_produk}>
                                 <td>{item.id_produk}</td>
+                                <td>
+                                    {item.nama_file ? (
+                                        <img
+                                        src={`http://localhost:5000/uploads/${item.nama_file}`}
+                                        alt={item.judul}
+                                        width="70"
+                                        className="rounded"
+                                        />
+                                    ) : (
+                                        <span className="text-muted">Tidak ada foto</span>
+                                    )}
+                                </td>
                                 <td>{item.judul}</td>
                                 <td>{item.deskripsi}</td>
                                 <td>Rp {item.harga}</td>
