@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
+import Login from "./pages/Login";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Produk from "./pages/Produk";
@@ -7,14 +8,14 @@ import AddProduk from "./pages/AddProduk";
 import EditProduk from "./pages/EditProduk";
 import Kategori from "./pages/Kategori";
 import Tentang from "./pages/Tentang";
-import Login from "./pages/Login";
+
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
   if (!token) {
     return <Navigate to="/login" replace />;
   }
-  return children;
+  return children
 }
 
 export default function App() {
@@ -41,5 +42,5 @@ export default function App() {
         </Route>
       </Routes>
     </BrowserRouter>
-  );
+  )
 }

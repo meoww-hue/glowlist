@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
     },
 });
 
-const upload = multer({ storage: storage});
+const uploads = multer({ storage: storage });
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -61,17 +61,18 @@ app.get('/pengguna/me', authJWT, (req, res) => {
     const sql = 'SELECT id_pengguna, nama, email, no_hp FROM pengguna WHERE id_pengguna =?';
     db.query(sql, [id_pengguna], (err, result) => {
         if (err) {
-            return res.status(500).json({ error: err.sqlMessage});
+            return res.status(500).json({ error: err.sqlMessage });
         }
         if (result.length === 0) {
-            return res.status(404).json({ message: 'Pengguna tidak ditemukan'});
+            return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
         }
         res.json(result);
     });
 });
 
-app.post('/produk', authJWT, upload.single('file'), (req, res) => {
+app.post('/produk', authJWT, uploads.single('file'), (req, res) => {
     const { judul, deskripsi, harga, id_kategori } = req.body;
+    const nama_file = req.file ? req.file.filename : null;
 
     if (!judul || !harga || !deskripsi) {
         return res.status(400).json({ message: 'Judul, harga, dan deskripsi wajib diisi' });
@@ -87,7 +88,7 @@ app.post('/produk', authJWT, upload.single('file'), (req, res) => {
     });
 });
 
-app.put('/produk/:id_produk', authJWT, (req, res) => {
+app.put('/produk/:id_produk', authJWT, uploads.single('file'), (req, res) => {
     const { id_produk } = req.params;
     const { judul, deskripsi, harga, id_kategori } = req.body;
 
@@ -95,14 +96,22 @@ app.put('/produk/:id_produk', authJWT, (req, res) => {
         return res.status(400).json({ message: 'Judul dan harga wajib diisi' });
     }
 
-    const sql = 'UPDATE produk SET judul=?, deskripsi=?, harga=?, id_kategori=? WHERE id_produk=?';
-    db.query(sql, [judul, deskripsi, harga, id_kategori, id_produk], (err, result) => {
+    const cekSql = 'SELECT nama_file FROM produk WHERE id_produk =?'
+    db.query(cekSql, [id_produk], (err, result) => {
         if (err) return res.status(500).json({ error: err.sqlMessage });
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: "Produk tidak ditemukan" });
-        }
-        res.json({ message: 'Produk berhasil diupdate!' });
+
+        const nama_file = req.file ? req.file.filename : result[0].nama_file;
+
+        const sql = 'UPDATE produk SET judul=?, deskripsi=?, harga=?, id_kategori=?, nama_file=? WHERE id_produk=?';
+        db.query(sql, [judul, deskripsi, harga, id_kategori,  nama_file, id_produk], (err, result) => {
+            if (err) return res.status(500).json({ error: err.sqlMessage });
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: "Produk tidak ditemukan" });
+            }
+            res.json({ message: 'Produk berhasil diupdate!' });
+        });
     });
 });
 
